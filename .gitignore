@@ -39,6 +39,7 @@
 *.tar
 *.xz
 *.log
+*.zip
 Module.symvers
 modules.builtin
 
