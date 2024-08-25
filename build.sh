@@ -13,16 +13,16 @@
 SECONDS=0 # builtin bash timer
 LOCAL_DIR=/workspace/android_kernel_xiaomi_ginkgo
 
-ZIPNAME="RyzenKernel-AOSP-Ginkgo-$(TZ=Europe/Warsaw date +"%Y%m%d-%H%M").zip"
-ZIPNAME_KSU="RyzenKernel-AOSP-Ginkgo-KSU-$(TZ=Europe/Warsaw date +"%Y%m%d-%H%M").zip"
+ZIPNAME="RyzenKernel-AOSP-Ginkgo-DockerConfig$(TZ=Europe/Warsaw date +"%Y%m%d-%H%M").zip"
+ZIPNAME_KSU="RyzenKernel-AOSP-Ginkgo-KSU-DockerConfig$(TZ=Europe/Warsaw date +"%Y%m%d-%H%M").zip"
 
 TC_DIR="${LOCAL_DIR}/toolchain"
 CLANG_DIR="${TC_DIR}/clang-rastamod"
 GCC_64_DIR="${TC_DIR}/aarch64-linux-android-4.9"
 GCC_32_DIR="${TC_DIR}/arm-linux-androideabi-4.9"
-AK3_DIR="${LOCAL_DIR}AnyKernel3"
+AK3_DIR="${LOCAL_DIR}/AnyKernel3"
 
-DEFCONFIG="vendor/ginkgo-perf_defconfig"
+DEFCONFIG="vendor/ginkgo-perf-dockerflv_defconfig"
 
 export PATH="$CLANG_DIR/bin:$PATH"
 export LD_LIBRARY_PATH="$CLANG_DIR/lib:$LD_LIBRARY_PATH"
@@ -61,7 +61,9 @@ else
 fi
 
 # Set function for override kernel name and variants
-curl -kLSs "https://raw.githubusercontent.com/kutemeikito/KernelSU/main/kernel/setup.sh" | bash -s main
+# https://kernelsu.org/guide/how-to-integrate-for-non-gki.html guys how to port GKI kernel to ginko?
+curl -kLSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -s v0.9.5
+# curl -kLSs "https://raw.githubusercontent.com/kutemeikito/KernelSU/main/kernel/setup.sh" | bash -s main
 if [[ $1 = "-k" || $1 = "--ksu" ]]; then
 echo -e "\nKSU Support, let's Make it On\n"
 else
@@ -71,7 +73,8 @@ sed -i 's/CONFIG_LOCALVERSION="-RyzenKernel-KSU"/CONFIG_LOCALVERSION="-RyzenKern
 fi
 
 mkdir -p out
-make O=out ARCH=arm64 $DEFCONFIG
+# make O=out ARCH=arm64 $DEFCONFIG savedefconfig
+# make O=out ARCH=arm64 menuconfig savedefconfig
 
 echo -e "\nStarting compilation...\n"
 make -j$(nproc --all) O=out \
