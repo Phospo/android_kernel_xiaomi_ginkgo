@@ -142,3 +142,6 @@ out/
 # Ignore KernelSU folders
 KernelSU/
 drivers/kernelsu
+toolchain/aarch64-linux-android-4.9
+toolchain/arm-linux-androideabi-4.9
+toolchain/clang-rastamod
