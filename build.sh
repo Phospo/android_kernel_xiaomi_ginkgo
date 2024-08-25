@@ -11,26 +11,27 @@
 # Use this script on root of kernel directory
 
 SECONDS=0 # builtin bash timer
-LOCAL_DIR=/home/ryuzenn/
-ZIPNAME="RyzenKernel-AOSP-Ginkgo-$(TZ=Asia/Jakarta date +"%Y%m%d-%H%M").zip"
-ZIPNAME_KSU="RyzenKernel-AOSP-Ginkgo-KSU-$(TZ=Asia/Jakarta date +"%Y%m%d-%H%M").zip"
-TC_DIR="${LOCAL_DIR}toolchain"
+LOCAL_DIR=/workspace/android_kernel_xiaomi_ginkgo
+
+ZIPNAME="RyzenKernel-AOSP-Ginkgo-$(TZ=Europe/Warsaw date +"%Y%m%d-%H%M").zip"
+ZIPNAME_KSU="RyzenKernel-AOSP-Ginkgo-KSU-$(TZ=Europe/Warsaw date +"%Y%m%d-%H%M").zip"
+
+TC_DIR="${LOCAL_DIR}/toolchain"
 CLANG_DIR="${TC_DIR}/clang-rastamod"
-GCC_64_DIR="${LOCAL_DIR}toolchain/aarch64-linux-android-4.9"
-GCC_32_DIR="${LOCAL_DIR}toolchain/arm-linux-androideabi-4.9"
+GCC_64_DIR="${TC_DIR}/aarch64-linux-android-4.9"
+GCC_32_DIR="${TC_DIR}/arm-linux-androideabi-4.9"
 AK3_DIR="${LOCAL_DIR}AnyKernel3"
+
 DEFCONFIG="vendor/ginkgo-perf_defconfig"
 
 export PATH="$CLANG_DIR/bin:$PATH"
-export KBUILD_BUILD_USER="EdwiinKJ"
-export KBUILD_BUILD_HOST="RastaMod69"
 export LD_LIBRARY_PATH="$CLANG_DIR/lib:$LD_LIBRARY_PATH"
 export KBUILD_BUILD_VERSION="1"
 export LOCALVERSION
 
 if ! [ -d "${CLANG_DIR}" ]; then
 echo "Clang not found! Cloning to ${TC_DIR}..."
-if ! git clone --depth=1 -b clang-20.0 https://gitlab.com/kutemeikito/rastamod69-clang ${CLANG_DIR}; then
+if ! git clone --depth=1 https://gitlab.com/kutemeikito/rastamod69-clang ${CLANG_DIR}; then
 echo "Cloning failed! Aborting..."
 exit 1
 fi
@@ -87,10 +88,13 @@ make -j$(nproc --all) O=out \
 					  CROSS_COMPILE_COMPAT=arm-linux-gnueabi- \
 					  CLANG_TRIPLE=aarch64-linux-gnu- \
 					  Image.gz-dtb \
-					  dtbo.img
+					  dtbo.img \
+					  2>&1 | tee error.log
+					  
 
 if [ -f "out/arch/arm64/boot/Image.gz-dtb" ] && [ -f "out/arch/arm64/boot/dtbo.img" ]; then
 echo -e "\nKernel compiled succesfully! Zipping up...\n"
+
 git restore arch/arm64/configs/vendor/ginkgo-perf_defconfig
 if [ -d "$AK3_DIR" ]; then
 cp -r $AK3_DIR AnyKernel3
@@ -98,19 +102,24 @@ elif ! git clone -q https://github.com/kutemeikito/AnyKernel3; then
 echo -e "\nAnyKernel3 repo not found locally and cloning failed! Aborting..."
 exit 1
 fi
+
 cp out/arch/arm64/boot/Image.gz-dtb AnyKernel3
 cp out/arch/arm64/boot/dtbo.img AnyKernel3
+
 rm -f *zip
 cd AnyKernel3
+
 git checkout main &> /dev/null
 if [[ $1 = "-k" || $1 = "--ksu" ]]; then
 zip -r9 "../$ZIPNAME_KSU" * -x '*.git*' README.md *placeholder
 else
 zip -r9 "../$ZIPNAME" * -x '*.git*' README.md *placeholder
 fi
+
 cd ..
 rm -rf AnyKernel3
 rm -rf out/arch/arm64/boot
+
 echo -e "======================================="
 echo -e "░█▀▀█ █──█ ▀▀█ █▀▀ █▀▀▄ "
 echo -e "░█▄▄▀ █▄▄█ ▄▀─ █▀▀ █──█ "
@@ -121,6 +130,7 @@ echo -e "░█▀▄─ █▀▀ █▄▄▀ █──█ █▀▀ █──
 echo -e "░█─░█ ▀▀▀ ▀─▀▀ ▀──▀ ▀▀▀ ▀▀▀ "
 echo -e "======================================="
 echo -e "Completed in $((SECONDS / 60)) minute(s) and $((SECONDS % 60)) second(s) !"
+
 if [[ $1 = "-k" || $1 = "--ksu" ]]; then
 echo "Zip: $ZIPNAME_KSU"
 else
@@ -130,6 +140,7 @@ else
 echo -e "\nCompilation failed!"
 exit 1
 fi
+
 echo "Move Zip into Home Directory"
 mv *.zip ${LOCAL_DIR}
 echo -e "======================================="

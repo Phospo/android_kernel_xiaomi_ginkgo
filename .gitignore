@@ -38,6 +38,7 @@
 *.symtypes
 *.tar
 *.xz
+*.log
 Module.symvers
 modules.builtin
 
