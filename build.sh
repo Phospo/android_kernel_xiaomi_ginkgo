@@ -101,7 +101,7 @@ echo -e "\nKernel compiled succesfully! Zipping up...\n"
 # git restore arch/arm64/configs/vendor/ginkgo-perf_defconfig
 if [ -d "$AK3_DIR" ]; then
 cp -r $AK3_DIR AnyKernel3
-elif ! git clone -q https://github.com/kutemeikito/AnyKernel3; then
+elif ! git clone -q https://github.com/Phospo/AnyKernel3; then
 echo -e "\nAnyKernel3 repo not found locally and cloning failed! Aborting..."
 exit 1
 fi
@@ -120,8 +120,8 @@ zip -r9 "../$ZIPNAME" * -x '*.git*' README.md *placeholder
 fi
 
 cd ..
-# rm -rf AnyKernel3
-# rm -rf out/arch/arm64/boot
+rm -rf AnyKernel3
+rm -rf out/arch/arm64/boot
 
 echo -e "======================================="
 echo -e "░█▀▀█ █──█ ▀▀█ █▀▀ █▀▀▄ "
