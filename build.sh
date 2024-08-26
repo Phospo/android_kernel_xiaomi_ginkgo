@@ -98,7 +98,7 @@ make -j$(nproc --all) O=out \
 if [ -f "out/arch/arm64/boot/Image.gz-dtb" ] && [ -f "out/arch/arm64/boot/dtbo.img" ]; then
 echo -e "\nKernel compiled succesfully! Zipping up...\n"
 
-git restore arch/arm64/configs/vendor/ginkgo-perf_defconfig
+# git restore arch/arm64/configs/vendor/ginkgo-perf_defconfig
 if [ -d "$AK3_DIR" ]; then
 cp -r $AK3_DIR AnyKernel3
 elif ! git clone -q https://github.com/kutemeikito/AnyKernel3; then
@@ -120,8 +120,8 @@ zip -r9 "../$ZIPNAME" * -x '*.git*' README.md *placeholder
 fi
 
 cd ..
-rm -rf AnyKernel3
-rm -rf out/arch/arm64/boot
+# rm -rf AnyKernel3
+# rm -rf out/arch/arm64/boot
 
 echo -e "======================================="
 echo -e "░█▀▀█ █──█ ▀▀█ █▀▀ █▀▀▄ "
