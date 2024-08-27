@@ -73,7 +73,7 @@ sed -i 's/CONFIG_LOCALVERSION="-RyzenKernel-KSU"/CONFIG_LOCALVERSION="-RyzenKern
 fi
 
 mkdir -p out
-# make O=out ARCH=arm64 $DEFCONFIG savedefconfig
+make O=out ARCH=arm64 $DEFCONFIG savedefconfig
 # make O=out ARCH=arm64 menuconfig savedefconfig
 
 echo -e "\nStarting compilation...\n"
