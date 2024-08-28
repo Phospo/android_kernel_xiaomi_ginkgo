@@ -68,8 +68,8 @@ if [[ $1 = "-k" || $1 = "--ksu" ]]; then
 echo -e "\nKSU Support, let's Make it On\n"
 else
 echo -e "\nKSU not Support, let's Make it off\n"
-sed -i 's/CONFIG_KSU=y/CONFIG_KSU=n/g' arch/arm64/configs/vendor/ginkgo-perf_defconfig
-sed -i 's/CONFIG_LOCALVERSION="-RyzenKernel-KSU"/CONFIG_LOCALVERSION="-RyzenKernel"/g' arch/arm64/configs/vendor/ginkgo-perf_defconfig
+sed -i 's/CONFIG_KSU=y/CONFIG_KSU=n/g' arch/arm64/configs/vendor/ginkgo-perf-dockerflv_defconfig
+sed -i 's/CONFIG_LOCALVERSION="-RyzenKernel-KSU"/CONFIG_LOCALVERSION="-RyzenKernel"/g' arch/arm64/configs/vendor/ginkgo-perf-dockerflv_defconfig
 fi
 
 mkdir -p out
