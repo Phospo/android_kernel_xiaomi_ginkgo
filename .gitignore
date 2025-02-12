@@ -38,6 +38,8 @@
 *.symtypes
 *.tar
 *.xz
+*.log
+*.zip
 Module.symvers
 modules.builtin
 
@@ -131,6 +133,7 @@ Android.bp
 
 # Ignore local folders
 AnyKernel3/
+toolchain/
 clang/
 gcc64/
 gcc32/
@@ -139,3 +142,4 @@ out/
 # Ignore KernelSU folders
 KernelSU/
 drivers/kernelsu
+

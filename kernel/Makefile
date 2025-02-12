@@ -123,7 +123,8 @@ else
 STOCK_DEFCONFIG := $(KCONFIG_CONFIG)
 endif
 
-$(obj)/config_data.gz: $(STOCK_DEFCONFIG) FORCE
+# $(obj)/config_data.gz: $(STOCK_DEFCONFIG) FORCE #No Internal problem error
+$(obj)/config_data.gz: $(KCONFIG_CONFIG) FORCE #Likely Internal problem error, used for ./check-config.sh
 	$(call if_changed,gzip)
 
       filechk_ikconfiggz = (echo "static const char kernel_config_data[] __used = MAGIC_START"; cat $< | scripts/basic/bin2c; echo "MAGIC_END;")
