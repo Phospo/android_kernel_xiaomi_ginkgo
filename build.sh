@@ -10,20 +10,20 @@
 #
 # Use this script on root of kernel directory
 
+sudo apt install bc python2
+
 SECONDS=0 # builtin bash timer
-LOCAL_DIR=/home/ryuzenn/
-ZIPNAME="RyzenKernel-AOSP-Ginkgo-$(TZ=Asia/Jakarta date +"%Y%m%d-%H%M").zip"
-ZIPNAME_KSU="RyzenKernel-AOSP-Ginkgo-KSU-$(TZ=Asia/Jakarta date +"%Y%m%d-%H%M").zip"
-TC_DIR="${LOCAL_DIR}toolchain"
+LOCAL_DIR=/workspace/android_kernel_xiaomi_ginkgo
+ZIPNAME="RyzenKernel-AOSP-Ginkgo-DockerConfig$(TZ=Europe/Warsaw date +"%Y%m%d-%H%M").zip"
+ZIPNAME_KSU="RyzenKernel-AOSP-Ginkgo-KSU-DockerConfig$(TZ=Europe/Warsaw date +"%Y%m%d-%H%M").zip"
+TC_DIR="${LOCAL_DIR}/toolchain"
 CLANG_DIR="${TC_DIR}/clang-rastamod"
-GCC_64_DIR="${LOCAL_DIR}toolchain/aarch64-linux-android-4.9"
-GCC_32_DIR="${LOCAL_DIR}toolchain/arm-linux-androideabi-4.9"
-AK3_DIR="${LOCAL_DIR}AnyKernel3"
-DEFCONFIG="vendor/ginkgo-perf_defconfig"
+GCC_64_DIR="${LOCAL_DIR}/toolchain/aarch64-linux-android-4.9"
+GCC_32_DIR="${LOCAL_DIR}/toolchain/arm-linux-androideabi-4.9"
+AK3_DIR="${LOCAL_DIR}/AnyKernel3"
+DEFCONFIG="vendor/ginkgo-perf-dockerflv_defconfig"
 
 export PATH="$CLANG_DIR/bin:$PATH"
-export KBUILD_BUILD_USER="EdwiinKJ"
-export KBUILD_BUILD_HOST="RastaMod69"
 export LD_LIBRARY_PATH="$CLANG_DIR/lib:$LD_LIBRARY_PATH"
 export KBUILD_BUILD_VERSION="1"
 export LOCALVERSION
@@ -64,14 +64,18 @@ if [[ $1 = "-k" || $1 = "--ksu" ]]; then
 echo -e "\nKSU Support, let's Make it On\n"
 curl -kLSs "https://raw.githubusercontent.com/kutemeikito/KernelSU-Next/next/kernel/setup.sh" | bash -s next
 git apply KernelSU-hook.patch
-sed -i 's/CONFIG_KSU=n/CONFIG_KSU=y/g' arch/arm64/configs/vendor/ginkgo-perf_defconfig
-sed -i 's/CONFIG_LOCALVERSION="-RyzenKernel"/CONFIG_LOCALVERSION="-RyzenKernel-KSU"/g' arch/arm64/configs/vendor/ginkgo-perf_defconfig
 else
 echo -e "\nKSU not Support, let's Skip\n"
+sed -i 's/CONFIG_KSU=y/CONFIG_KSU=n/g' arch/arm64/configs/vendor/ginkgo-perf-dockerflv_defconfig
+sed -i 's/CONFIG_LOCALVERSION="-RyzenKernel-KSU"/CONFIG_LOCALVERSION="-RyzenKernel"/g' arch/arm64/configs/vendor/ginkgo-perf-dockerflv_defconfig
+git restore kernel/*
+git restore fs/*
+git restore include
+git restore drivers
 fi
 
 mkdir -p out
-make O=out ARCH=arm64 $DEFCONFIG
+make O=out ARCH=arm64 $DEFCONFIG savedefconfig
 
 echo -e "\nStarting compilation...\n"
 make -j$(nproc --all) O=out \
@@ -88,11 +92,12 @@ make -j$(nproc --all) O=out \
 					  CROSS_COMPILE_COMPAT=arm-linux-gnueabi- \
 					  CLANG_TRIPLE=aarch64-linux-gnu- \
 					  Image.gz-dtb \
-					  dtbo.img
+					  dtbo.img \
+					  2>&1 | tee error.log
 
 if [ -f "out/arch/arm64/boot/Image.gz-dtb" ] && [ -f "out/arch/arm64/boot/dtbo.img" ]; then
 echo -e "\nKernel compiled succesfully! Zipping up...\n"
-git restore arch/arm64/configs/vendor/ginkgo-perf_defconfig
+# git restore arch/arm64/configs/vendor/ginkgo-perf_defconfig
 if [ -d "$AK3_DIR" ]; then
 cp -r $AK3_DIR AnyKernel3
 elif ! git clone -q https://github.com/kutemeikito/AnyKernel3; then
